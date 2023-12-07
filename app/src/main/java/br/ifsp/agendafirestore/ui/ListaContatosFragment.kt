@@ -1,4 +1,4 @@
-package br.ifsp.agendaroom.ui
+package br.ifsp.agendafirestore.ui
 
 
 import android.os.Bundle
@@ -9,17 +9,21 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import br.ifsp.agendaroom.R
-import br.ifsp.agendaroom.adapter.ContatoAdapter
-import br.ifsp.agendaroom.databinding.FragmentListaContatosBinding
-import br.ifsp.agendaroom.viewmodel.ContatoViewModel
+import br.ifsp.agendafirestore.R
+import br.ifsp.agendafirestore.adapter.ContatoAdapter
+import br.ifsp.agendafirestore.databinding.FragmentListaContatosBinding
+import br.ifsp.agendafirestore.model.Contato
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class ListaContatosFragment : Fragment(){
 
@@ -29,17 +33,10 @@ class ListaContatosFragment : Fragment(){
 
     lateinit var contatoAdapter: ContatoAdapter
 
-    lateinit var viewModel: ContatoViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentListaContatosBinding.inflate(inflater, container, false)
 
@@ -69,7 +66,28 @@ class ListaContatosFragment : Fragment(){
                     }
 
                     override fun onQueryTextChange(p0: String?): Boolean {
-                        contatoAdapter.filter.filter(p0)
+
+                        lateinit var query:Query
+
+                        if (p0!="") {
+                            query = Firebase.firestore
+                                .collection("contatos")
+                                .whereGreaterThanOrEqualTo("nome", p0.toString())
+                                .whereLessThanOrEqualTo("nome",p0.toString()+"\uf8ff")
+                        }
+                        else
+                        {
+                             query= Firebase.firestore.collection("contatos").orderBy("nome")
+
+                        }
+
+                        val newOptions: FirestoreRecyclerOptions<Contato> = FirestoreRecyclerOptions
+                            .Builder<Contato>()
+                            .setQuery(query, Contato::class.java).build()
+
+                        contatoAdapter.updateOptions(newOptions)
+                        contatoAdapter.notifyDataSetChanged()
+
                         return true
                     }
 
@@ -87,25 +105,21 @@ class ListaContatosFragment : Fragment(){
     private fun configureRecyclerView()
     {
 
-        viewModel = ViewModelProvider(this).get(ContatoViewModel::class.java)
-
-        viewModel.allContacts.observe(viewLifecycleOwner) { list ->
-            list?.let {
-                contatoAdapter.updateList(list)
-            }
-        }
+        val db = Firebase.firestore
+        val query: Query = db.collection("contatos").orderBy("nome")
+        val options: FirestoreRecyclerOptions<Contato> =
+            FirestoreRecyclerOptions.Builder<Contato>()
+                .setLifecycleOwner(this)
+                .setQuery(query, Contato::class.java).build()
 
         val recyclerView = binding.recyclerview
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        contatoAdapter = ContatoAdapter()
+        contatoAdapter = ContatoAdapter(options)
         recyclerView.adapter = contatoAdapter
 
         val listener = object : ContatoAdapter.ContatoListener {
             override fun onItemClick(pos: Int) {
-                val c = contatoAdapter.contatosListaFilterable[pos]
-
-                val bundle = Bundle()
-                bundle.putInt("idContato", c.id)
+                val bundle = bundleOf("idContato" to contatoAdapter.snapshots.getSnapshot(pos).id)
 
                 findNavController().navigate(
                     R.id.action_listaContatosFragment_to_detalheFragment,

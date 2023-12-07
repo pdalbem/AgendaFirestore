@@ -1,4 +1,4 @@
-package br.ifsp.agendaroom
+package br.ifsp.agendafirestore
 
 import org.junit.Test
 

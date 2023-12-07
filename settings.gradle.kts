@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AgendaRoom"
+rootProject.name = "AgendaFirestore"
 include(":app")

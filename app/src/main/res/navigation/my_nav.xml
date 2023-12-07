@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/listaContatosFragment"
-        android:name="br.ifsp.agendaroom.ui.ListaContatosFragment"
+        android:name="br.ifsp.agendafirestore.ui.ListaContatosFragment"
         android:label="Contatos"
         tools:layout="@layout/fragment_lista_contatos" >
         <action
@@ -19,12 +19,12 @@
     </fragment>
     <fragment
         android:id="@+id/cadastroFragment"
-        android:name="br.ifsp.agendaroom.ui.CadastroFragment"
+        android:name="br.ifsp.agendafirestore.ui.CadastroFragment"
         android:label="Novo contato"
         tools:layout="@layout/fragment_cadastro" />
     <fragment
         android:id="@+id/detalheFragment"
-        android:name="br.ifsp.agendaroom.ui.DetalheFragment"
+        android:name="br.ifsp.agendafirestore.ui.DetalheFragment"
         android:label="Detalhes"
         tools:layout="@layout/fragment_detalhe" />
 </navigation>

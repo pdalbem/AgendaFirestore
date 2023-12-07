@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AgendaRoom</string>
+    <string name="app_name">AgendaFirestore</string>
     <string name="nome">Nome:</string>
     <string name="fone">Telefone:</string>
     <string name="email">Email:</string>

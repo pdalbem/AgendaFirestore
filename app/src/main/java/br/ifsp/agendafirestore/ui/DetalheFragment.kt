@@ -1,4 +1,4 @@
-package br.ifsp.agendaroom.ui
+package br.ifsp.agendafirestore.ui
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,37 +12,32 @@ import android.widget.EditText
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import br.ifsp.agendaroom.R
-import br.ifsp.agendaroom.data.Contato
-import br.ifsp.agendaroom.databinding.FragmentDetalheBinding
-import br.ifsp.agendaroom.viewmodel.ContatoViewModel
+import br.ifsp.agendafirestore.R
+import br.ifsp.agendafirestore.databinding.FragmentDetalheBinding
+import br.ifsp.agendafirestore.model.Contato
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.toObject
+import com.google.firebase.ktx.Firebase
 
 
 class DetalheFragment : Fragment() {
     private var _binding: FragmentDetalheBinding? = null
     private val binding get() = _binding!!
 
-    lateinit var contato: Contato
-
     lateinit  var nomeEditText: EditText
     lateinit var foneEditText: EditText
     lateinit var emailEditText: EditText
 
-    lateinit var viewModel: ContatoViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this).get(ContatoViewModel::class.java)
-    }
+    val db = Firebase.firestore
+    lateinit var idContato: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentDetalheBinding.inflate(inflater, container, false)
 
@@ -57,18 +52,25 @@ class DetalheFragment : Fragment() {
         foneEditText = binding.commonLayout.editTextFone
         emailEditText = binding.commonLayout.editTextEmail
 
-        val idContato = requireArguments().getInt("idContato")
+        idContato = requireArguments().getString("idContato").toString()
 
-        viewModel.getContactById(idContato)
+        db.collection("contatos")
+            .document(idContato)
+            .addSnapshotListener { value, error ->
+                if (value!=null)
+                {
+                    val c = value.toObject<Contato>()
 
-        viewModel.contato.observe(viewLifecycleOwner) { result ->
-            result?.let {
-                contato = result
-                nomeEditText.setText(contato.nome)
-                foneEditText.setText(contato.fone)
-                emailEditText.setText(contato.email)
+                    val nome = view.findViewById<EditText>(R.id.editTextNome)
+                    val fone = view.findViewById<EditText>(R.id.editTextFone)
+                    val email = view.findViewById<EditText>(R.id.editTextEmail)
+
+                    nome?.setText(c?.nome.toString())
+                    fone?.setText(c?.fone.toString())
+                    email?.setText(c?.email.toString())
+
+                }
             }
-        }
 
         val menuHost: MenuHost = requireActivity()
 
@@ -83,11 +85,14 @@ class DetalheFragment : Fragment() {
                 return when (menuItem.itemId) {
                     R.id.action_alterarContato -> {
 
+                        val contato= Contato()
                         contato.nome=nomeEditText.text.toString()
                         contato.fone=foneEditText.text.toString()
                         contato.email=emailEditText.text.toString()
 
-                        viewModel.update(contato)
+                        db.collection("contatos")
+                            .document(idContato)
+                            .set(contato)
 
                         Snackbar.make(binding.root, "Contato alterado", Snackbar.LENGTH_SHORT).show()
 
@@ -95,7 +100,8 @@ class DetalheFragment : Fragment() {
                         true
                     }
                     R.id.action_excluirContato ->{
-                        viewModel.delete(contato)
+                        db.collection("contatos")
+                            .document(idContato).delete()
 
                         Snackbar.make(binding.root, "Contato apagado", Snackbar.LENGTH_SHORT).show()
 

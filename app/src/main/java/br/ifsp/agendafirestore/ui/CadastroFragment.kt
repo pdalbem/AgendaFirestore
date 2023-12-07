@@ -1,4 +1,4 @@
-package br.ifsp.agendaroom.ui
+package br.ifsp.agendafirestore.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,32 +11,24 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import br.ifsp.agendaroom.R
-import br.ifsp.agendaroom.data.Contato
-import br.ifsp.agendaroom.databinding.FragmentCadastroBinding
-import br.ifsp.agendaroom.viewmodel.ContatoViewModel
+import br.ifsp.agendafirestore.R
+import br.ifsp.agendafirestore.databinding.FragmentCadastroBinding
+import br.ifsp.agendafirestore.model.Contato
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 
 class CadastroFragment : Fragment(){
     private var _binding: FragmentCadastroBinding? = null
     private val binding get() = _binding!!
 
-    lateinit var viewModel: ContatoViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this).get(ContatoViewModel::class.java)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentCadastroBinding.inflate(inflater, container, false)
 
@@ -63,9 +55,11 @@ class CadastroFragment : Fragment(){
                         val fone = binding.commonLayout.editTextFone.text.toString()
                         val email = binding.commonLayout.editTextEmail.text.toString()
 
-                        val contato = Contato(0,nome, fone, email)
+                        val contato = Contato(nome, fone, email)
 
-                        viewModel.insert(contato)
+                        val db = Firebase.firestore
+
+                        db.collection("contatos").add(contato)
 
                         Snackbar.make(binding.root, "Contato inserido", Snackbar.LENGTH_SHORT).show()
                         findNavController().popBackStack()

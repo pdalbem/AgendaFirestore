@@ -1,4 +1,4 @@
-package br.ifsp.agendaroom
+package br.ifsp.agendafirestore
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,7 +7,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import br.ifsp.agendaroom.databinding.ActivityMainBinding
+import br.ifsp.agendafirestore.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
