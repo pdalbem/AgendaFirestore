@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AgendaFirestore</string>
+    <string name="nome">Nome:</string>
+    <string name="fone">Telefone:</string>
+    <string name="email">Email:</string>
+    <string name="salvar">Salvar</string>
+    <string name="excluir">Excluir</string>
+    <string name="pesquisar">Pesquisar</string>
+</resources>

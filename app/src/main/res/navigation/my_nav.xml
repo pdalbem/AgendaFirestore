@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/my_nav"
+    app:startDestination="@id/listaContatosFragment">
+
+    <fragment
+        android:id="@+id/listaContatosFragment"
+        android:name="br.edu.ifsp.agendafirestore.ui.ListaContatosFragment"
+        android:label="Contatos"
+        tools:layout="@layout/fragment_lista_contatos" >
+        <action
+            android:id="@+id/action_listaContatosFragment_to_cadastroFragment"
+            app:destination="@id/cadastroFragment" />
+        <action
+            android:id="@+id/action_listaContatosFragment_to_detalheFragment"
+            app:destination="@id/detalheFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cadastroFragment"
+        android:name="br.edu.ifsp.agendafirestore.ui.CadastroFragment"
+        android:label="Novo contato"
+        tools:layout="@layout/fragment_cadastro" />
+    <fragment
+        android:id="@+id/detalheFragment"
+        android:name="br.edu.ifsp.agendafirestore.ui.DetalheFragment"
+        android:label="Detalhes"
+        tools:layout="@layout/fragment_detalhe" />
+</navigation>
